@@ -59,3 +59,16 @@ The Turnstile site key is public and must be set in the website's `assets/app-co
 ## Verification
 
 GitHub Actions checks the 25-module static website, JavaScript syntax, existing YouTube tests, Worker syntax, D1 schema structure, private/public data separation and Worker configuration. Passing CI does not mean the Cloudflare Worker has been deployed or live database operations have been tested.
+
+## বিকল্প Deploy পদ্ধতি — GitHub Actions
+
+Cloudflare-এর নিজস্ব Builds-এ পুরোনো migration conflict হলে এই আলাদা workflow ব্যবহার করুন। এটি শুধু Worker deploy করে; D1 migration চালায় না এবং কোনো ডেটা মুছে না।
+
+1. Cloudflare Dashboard → My Profile → API Tokens → Create Token থেকে custom token তৈরি করুন।
+2. প্রয়োজনীয় permission দিন: Account → Workers Scripts → Edit এবং Account → Account Settings → Read। শুধু এই Cloudflare account-এ সীমাবদ্ধ রাখুন।
+3. GitHub repository → Settings → Secrets and variables → Actions → New repository secret খুলুন।
+4. Secret name দিন CLOUDFLARE_API_TOKEN; Cloudflare token value সেখানে দিন। Token কখনো chat, source code বা README-তে লিখবেন না।
+5. GitHub repository → Actions → Deploy World-Class Hybrid Cloudflare Worker → Run workflow চাপুন।
+6. সফল হলে Worker URL-এ /api/health খুলে ok: true দেখা যাচ্ছে কি না যাচাই করুন।
+
+এই workflow manual trigger-এ সীমাবদ্ধ; Secret যোগ না করা পর্যন্ত কোনো deploy হবে না। Workflow সফল হওয়া মানেই frontend API integration বা public forms/admin setup সম্পন্ন নয়—সেগুলো আলাদাভাবে সংযুক্ত ও পরীক্ষা করতে হবে।
