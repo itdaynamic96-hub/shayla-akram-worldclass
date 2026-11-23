@@ -1,14 +1,8 @@
 import { normalizeVideos, embedUrl } from "./youtube.mjs";
-const root = document.getElementById("videoGallery");
-const status = document.getElementById("galleryStatus");
-if (root) {
-  fetch("videos.json", { cache: "no-store" })
-    .then(response => { if (!response.ok) throw new Error("ভিডিও তালিকা পাওয়া যায়নি"); return response.json(); })
-    .then(data => {
-      const videos = normalizeVideos(data);
-      if (!videos.length) { root.innerHTML = '<div class="adminbox"><h2>ভিডিও শিগগিরই যুক্ত হবে</h2><p>এখনো কোনো ভিডিও প্রকাশ করা হয়নি।</p></div>'; return; }
-      root.innerHTML = videos.map(video => `<article class="video-card"><div class="video-frame"><iframe src="${embedUrl(video.id)}" title="${escapeHtml(video.title)}" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div><div class="video-copy"><h2>${escapeHtml(video.title)}</h2><p>${escapeHtml(video.description)}</p><a href="${video.url}" target="_blank" rel="noopener noreferrer">YouTube-এ দেখুন ↗</a></div></article>`).join("");
-    })
-    .catch(error => { root.innerHTML = '<div class="adminbox"><h2>ভিডিও লোড করা যায়নি</h2><p>পরে আবার চেষ্টা করুন।</p></div>'; if(status) status.textContent = error.message; });
+const root=document.getElementById("videoGallery"),status=document.getElementById("galleryStatus");
+if(root){
+ async function getVideos(){const api=window.APP_CONFIG?.apiBase;if(api){try{const response=await fetch(api+"/api/public/bootstrap",{cache:"no-store"});if(!response.ok)throw Error("API unavailable");const data=await response.json();return(data.videos||[]).map(v=>({id:v.youtubeId||v.youtube_id,title:v.title,description:v.description,url:v.url||("https://www.youtube.com/watch?v="+(v.youtubeId||v.youtube_id))}));}catch(error){console.warn("Cloudflare video API unavailable; using static list",error);}}const response=await fetch("videos.json",{cache:"no-store"});if(!response.ok)throw Error("ভিডিও তালিকা পাওয়া যায়নি");return await response.json();}
+ getVideos().then(data=>{const videos=normalizeVideos(data);if(!videos.length){root.innerHTML='<div class="adminbox"><h2>ভিডিও শিগগিরই যুক্ত হবে</h2><p>এখনো কোনো ভিডিও প্রকাশ করা হয়নি।</p></div>';return;}root.innerHTML=videos.map(video=>"<article class='video-card'><div class='video-frame'><iframe src='"+embedUrl(video.id)+"' title='"+escapeHtml(video.title)+"' loading='lazy' referrerpolicy='strict-origin-when-cross-origin' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' allowfullscreen></iframe></div><div class='video-copy'><h2>"+escapeHtml(video.title)+"</h2><p>"+escapeHtml(video.description)+"</p><a href='"+video.url+"' target='_blank' rel='noopener noreferrer'>YouTube-এ দেখুন ↗</a></div></article>").join("");})
+ .catch(error=>{root.innerHTML='<div class="adminbox"><h2>ভিডিও লোড করা যায়নি</h2><p>পরে আবার চেষ্টা করুন।</p></div>';if(status)status.textContent=error.message;});
 }
-function escapeHtml(value) { return String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
