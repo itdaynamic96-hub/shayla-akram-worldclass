@@ -1,7 +1,7 @@
 name = "shayla-worldclass-api"
 account_id = "27b2cda493e9bff20b1447cd4b1c6532"
 main = "src/index.js"
-compatibility_date = "2026-11-24"
+compatibility_date = "2026-11-23"
 workers_dev = true
 
 [[d1_databases]]
