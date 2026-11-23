@@ -5,7 +5,7 @@
 
 ## বর্তমান বাস্তব অবস্থা
 - হোমপেজ, বহুস্তর মেনু, ২৫টি মডিউল এবং মডিউল-ভিত্তিক তথ্য দেখানোর ব্যবস্থা রয়েছে।
-- এই সংস্করণে server-side database নেই; Appwrite Free project quota পূর্ণ এবং নতুন কোনো backend account সংযুক্ত করা হয়নি।
+- Cloudflare Free-এ এই প্রকল্পের জন্য আলাদা D1 database ও Worker resource তৈরি হয়েছে এবং Worker-এ D1 binding `DB` সংযুক্ত। তবে Worker dashboard-এ এখনো Hello World placeholder script আছে; API source deploy ও D1 migration শেষ হয়নি। তাই live backend এখনো চালু নয়।
 - `admin.html` একটি local browser content editor; এটি নিরাপদ অনলাইন admin login নয়। কনটেন্ট JSON export করে GitHub repository-তে commit করতে হয়।
 - `video-admin.html` দিয়ে YouTube URL, শিরোনাম ও বিবরণ যোগ/সম্পাদনা/মুছে ফেলা যায়। ভিডিও তালিকা localStorage-এ থাকে এবং `videos.json` export/import করা যায়।
 - YouTube gallery `videos.html`-এ privacy-enhanced `youtube-nocookie.com` embed ব্যবহার করে। কেবল HTTPS YouTube URL গ্রহণ করা হয়; watch, youtu.be, embed, shorts ও live URL সমর্থিত।
