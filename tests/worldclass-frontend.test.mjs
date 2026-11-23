@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 const root=new URL("../site-overrides/",import.meta.url);
 const read=path=>readFile(new URL(path,root),"utf8");
-const [config,admin,forms,setup,apply,volunteer,site,module,video]=await Promise.all([
- read("assets/app-config.js"),read("assets/admin.js"),read("assets/forms.js"),read("assets/setup.js"),
+const [config,admin,forms,setup,setupHtml,apply,volunteer,site,module,video]=await Promise.all([
+ read("assets/app-config.js"),read("assets/admin.js"),read("assets/forms.js"),read("assets/setup.js"),read("setup.html"),
  read("apply.html"),read("volunteer.html"),read("assets/site.js"),read("assets/module.js"),read("assets/video-gallery.js")
 ]);
 test("public frontend configuration points to the isolated Worker and only exposes Turnstile site key",()=>{
@@ -40,5 +40,5 @@ test("personal-data forms require Turnstile and send only to private intake endp
 test("first-admin setup requires a one-time token and strong password",()=>{
  assert.ok(setup.includes("X-Setup-Token"));
  assert.ok(setup.includes("/api/admin/setup"));
- assert.ok(setup.includes("password.length"));
+ assert.ok(setupHtml.includes("minlength=\"14\""));
 });
