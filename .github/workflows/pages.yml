@@ -25,6 +25,9 @@ jobs:
         run: |
           mkdir -p site
           tar -xzf site-source.tar.gz -C site
+          cp -R site-overrides/. site/
+          sed -i 's#</head>#<link rel="stylesheet" href="assets/menu.css"></head>#' site/index.html
+          sed -i 's#</body>#<script src="assets/menu.js" defer></script></body>#' site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
