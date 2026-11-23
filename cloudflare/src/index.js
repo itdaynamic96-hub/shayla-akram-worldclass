@@ -202,7 +202,7 @@ export default {
         }
         if(path==="/api/admin/prayer" && request.method==="POST") {
           const b=await readBody(request),date=clean(b.dateKey,10),keys=["fajr","sunrise","dhuhr","asr","maghrib","isha","jumuah"];
-          if(!validDate(date)||keys.some(k=>{const value=clean(b[k],5);return value!==""&&!/^([01]\\d|2[0-3]):[0-5]\\d$/.test(value);})||["fajr","dhuhr","asr","maghrib","isha"].some(k=>!clean(b[k],5)))return json({error:"তারিখ ও নামাজের সময় সঠিকভাবে দিন।"},400,cors);
+          if(!validDate(date)||keys.some(k=>{const value=clean(b[k],5);return value!==""&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(value);})||["fajr","dhuhr","asr","maghrib","isha"].some(k=>!clean(b[k],5)))return json({error:"তারিখ ও নামাজের সময় সঠিকভাবে দিন।"},400,cors);
           await env.DB.prepare("INSERT INTO prayer_times(date_key,fajr,sunrise,dhuhr,asr,maghrib,isha,jumuah,updated_at) VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(date_key) DO UPDATE SET fajr=excluded.fajr,sunrise=excluded.sunrise,dhuhr=excluded.dhuhr,asr=excluded.asr,maghrib=excluded.maghrib,isha=excluded.isha,jumuah=excluded.jumuah,updated_at=excluded.updated_at").bind(date,...keys.map(k=>clean(b[k],5)),nowIso()).run();
           await audit(env.DB,admin.admin_id,"save","prayer_times",date);return json({ok:true},200,cors);
         }
