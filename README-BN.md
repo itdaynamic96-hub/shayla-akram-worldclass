@@ -1,18 +1,20 @@
 # সাকছিপাড়া শায়লা আকরাম কেন্দ্রীয় জামে মসজিদ ও ফাউন্ডেশন
-## World-Class Hybrid — GitHub Pages Static Mode
+## World-Class Hybrid — GitHub Pages + Cloudflare Free প্রস্তুতি
 
 এই আলাদা প্রকল্পে ২৫টি মডিউলের ক্যাটালগ রয়েছে: মসজিদ ০১–১৬ এবং ফাউন্ডেশন ২৬–৩৪। মূল ওয়েবসাইট GitHub Pages-এ প্রকাশিত হয়।
 
 ## বর্তমান বাস্তব অবস্থা
 - হোমপেজ, বহুস্তর মেনু, ২৫টি মডিউল এবং মডিউল-ভিত্তিক তথ্য দেখানোর ব্যবস্থা রয়েছে।
-- Cloudflare Free-এ এই প্রকল্পের জন্য আলাদা D1 database ও Worker resource তৈরি হয়েছে এবং Worker-এ D1 binding `DB` সংযুক্ত। তবে Worker dashboard-এ এখনো Hello World placeholder script আছে; API source deploy ও D1 migration শেষ হয়নি। তাই live backend এখনো চালু নয়।
-- `admin.html` একটি local browser content editor; এটি নিরাপদ অনলাইন admin login নয়। কনটেন্ট JSON export করে GitHub repository-তে commit করতে হয়।
-- `video-admin.html` দিয়ে YouTube URL, শিরোনাম ও বিবরণ যোগ/সম্পাদনা/মুছে ফেলা যায়। ভিডিও তালিকা localStorage-এ থাকে এবং `videos.json` export/import করা যায়।
+- Cloudflare Free-এ এই প্রকল্পের জন্য আলাদা D1 database `shayla-worldclass-db` ও Worker `shayla-worldclass-api` তৈরি হয়েছে; Worker-এ D1 binding `DB` সংযুক্ত।
+- Cloudflare Workers Builds-এ শুধু এই repository `itdaynamic96-hub/shayla-akram-worldclass`, branch `main`, root `/` যুক্ত করা হয়েছে। Build command D1 migration চালায় এবং Deploy command Worker deploy করে। Git integration প্রস্তুত; প্রথম সফল deployment ও migration-এর ফল যাচাই না হওয়া পর্যন্ত live backend চালু হয়েছে বলা যাবে না।
+- Worker API source: `cloudflare/src/index.js`; D1 schema: `cloudflare/migrations/0001_init.sql`; বাংলা নির্দেশনা: `cloudflare/README-BN.md`।
+- `admin.html`-এর পুরোনো local browser editor নিরাপদ অনলাইন admin login নয়। Cloudflare Worker deploy ও front-end integration সম্পূর্ণ এবং পরীক্ষা না হওয়া পর্যন্ত এটি production admin হিসেবে ব্যবহার করবেন না।
+- `video-admin.html` দিয়ে YouTube URL, শিরোনাম ও বিবরণ যোগ/সম্পাদনা/মুছে ফেলা যায়। পুরোনো workflow-তে ভিডিও তালিকা localStorage-এ থাকে এবং `videos.json` export/import করা যায়।
 - YouTube gallery `videos.html`-এ privacy-enhanced `youtube-nocookie.com` embed ব্যবহার করে। কেবল HTTPS YouTube URL গ্রহণ করা হয়; watch, youtu.be, embed, shorts ও live URL সমর্থিত।
-- ভিডিও সবার জন্য প্রকাশ করতে `videos.json` export করে repository-র `site-overrides/videos.json` ফাইলে commit করতে হবে। এটি স্বয়ংক্রিয় publish নয়; local admin panel-এর সংরক্ষণ একই browser-এ সীমাবদ্ধ।
 - YouTube URL যোগ করা মানে YouTube-এ ভিডিও ফাইল আপলোড নয়। ভিডিওটি আগে YouTube-এ আপলোড করা থাকতে হবে এবং embed অনুমোদিত হতে হবে।
-- সহায়তার আবেদন ও স্বেচ্ছাসেবক নিবন্ধন সাময়িকভাবে বন্ধ; ব্যক্তিগত তথ্য জমা নেওয়ার সক্রিয় endpoint নেই।
-- Direct 50 MB video upload, media storage, prayer-time database sync, private application review, volunteer records, finance ledger, staff roles এবং পূর্ণ multi-user admin এখনো চালু নয়।
+- সহায়তার আবেদন ও স্বেচ্ছাসেবক নিবন্ধন সক্রিয় backend endpoint ও Turnstile secret যাচাই না হওয়া পর্যন্ত বন্ধ থাকবে।
+- Direct video file upload/media storage, prayer-time database sync, private application review, volunteer records, finance ledger ও staff roles এখনো live হিসেবে নিশ্চিত নয়।
+- R2 বা অন্য কোনো paid service, billing, paid plan বা auto-renew চালু করা হয়নি। এই সংস্করণে YouTube URL-ভিত্তিক ভিডিও ব্যবস্থাই বিনা খরচের বিকল্প।
 
 ## প্রকাশিত ওয়েবসাইট
 https://itdaynamic96-hub.github.io/shayla-akram-worldclass/
