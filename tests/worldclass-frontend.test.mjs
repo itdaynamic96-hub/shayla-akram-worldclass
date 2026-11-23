@@ -26,7 +26,8 @@ test("video gallery reads API video records and retains safe YouTube embeds",()=
 test("admin dashboard uses bearer sessions and private API routes",()=>{
  assert.ok(admin.includes("sessionStorage"));
  assert.ok(admin.includes("Authorization"));
- for(const route of ["/api/admin/login","/api/admin/data","/api/admin/content","/api/admin/video","/api/admin/prayer","/api/admin/finance","/api/admin/application/status","/api/admin/volunteer/status"])assert.ok(admin.includes(route),"missing "+route);
+ assert.ok(admin.includes('"/api/admin/"+s.dataset.statusKind+"/status"'));
+ for(const route of ["/api/admin/login","/api/admin/data","/api/admin/content","/api/admin/video","/api/admin/prayer","/api/admin/finance"])assert.ok(admin.includes(route),"missing "+route);
 });
 test("personal-data forms require Turnstile and send only to private intake endpoint",()=>{
  for(const page of [apply,volunteer]){
