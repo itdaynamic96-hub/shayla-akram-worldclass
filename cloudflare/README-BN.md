@@ -1,74 +1,52 @@
 # World-Class Hybrid — Cloudflare Free Backend
 
-এই backend কেবল `shayla-akram-worldclass` প্রকল্পের জন্য। অন্য কোনো মসজিদ ওয়েবসাইটের Supabase/Appwrite ব্যবহার করে না।
+এই backend কেবল **shayla-akram-worldclass** প্রকল্পের জন্য। অন্য কোনো ওয়েবসাইটের Supabase/Appwrite ব্যবহার করে না।
 
-## Free-only resource status
+## Live resource ও বর্তমান অবস্থা
 
-- D1 database: `shayla-worldclass-db` (ID: `4751623a-fcbd-4b68-b5a8-71f20c1fd2a7`)
-- Worker: `shayla-worldclass-api` — https://shayla-worldclass-api.itdaynamic96.workers.dev
-- Worker D1 binding: `DB` → `shayla-worldclass-db`
-- Cloudflare account Free plan; কোনো billing/payment method বা paid upgrade করা হয়নি।
-- R2 চালু করা হয়নি। Cloudflare R2 activation screen payment method on file এবং auto-renewal/beyond-free billing-এর কথা বলে; তাই strict no-payment policy-তে এটি ব্যবহার করা হবে না।
+- GitHub Pages: https://itdaynamic96-hub.github.io/shayla-akram-worldclass/
+- Worker: https://shayla-worldclass-api.itdaynamic96.workers.dev
+- D1: **shayla-worldclass-db**
+- Worker binding: **DB**
+- Worker health endpoint লাইভ পরীক্ষা করা হয়েছে; **ok: true** ফেরত দিয়েছে।
+- D1 schema initialization সম্পন্ন; ১০টি প্রয়োজনীয় অ্যাপ্লিকেশন টেবিল তৈরি হয়েছে।
+- Cloudflare Turnstile widget তৈরি এবং **TURNSTILE_SECRET** Worker secret হিসেবে সংরক্ষিত।
+- Turnstile public site key: **0x4AAAAAAGPk11jgYMKSZhj0** (এটি গোপন নয়)।
+- Frontend public bootstrap, module content, video gallery, admin UI ও intake form Worker API-র সঙ্গে সংযুক্ত।
+- R2, paid plan, billing, payment method বা auto-renew চালু করা হয়নি।
 
-**গুরুত্বপূর্ণ:** Worker dashboard-এ বর্তমানে অস্থায়ী Hello World script আছে। GitHub-এ থাকা `src/index.js` এখনো Worker-এ deploy হয়নি। D1 schema migration-ও এখনো চালানো হয়নি। তাই API-কে production-ready বলা যাবে না।
+## শেষ ধাপ: প্রথম অ্যাডমিন তৈরি
 
-## Repository files
+নিরাপত্তার কারণে প্রথম অ্যাডমিন স্বয়ংক্রিয়ভাবে তৈরি করা হয়নি। **SETUP_TOKEN** এখনো যোগ করতে হবে।
 
-- `cloudflare/src/index.js` — API source (admin sessions, content/video/prayer management, private application/volunteer intake, finance endpoints)
-- `cloudflare/migrations/0001_init.sql` — D1 schema and indexes
-- `cloudflare/wrangler.toml` — Worker and D1 binding configuration
-- `tests/cloudflare-backend.test.mjs` — schema, CORS/privacy and configuration checks
+1. Cloudflare Dashboard → Workers & Pages → shayla-worldclass-api → Settings → Variables and Secrets খুলুন।
+2. Secret যোগ করুন:
+   - Name: **SETUP_TOKEN**
+   - Value: setup.html পেজে **নিরাপদ সেটআপ টোকেন তৈরি** চাপলে যে ৬৪-হেক্স অক্ষরের টোকেন তৈরি হবে।
+3. GitHub Pages-এ setup.html খুলুন। একই টোকেনটি সেখানে দিন, একটি username এবং কমপক্ষে ১৪ অক্ষরের শক্তিশালী password বেছে নিয়ে প্রথম admin তৈরি করুন।
+4. সফল হওয়ার সঙ্গে সঙ্গে Cloudflare Worker Settings থেকে **SETUP_TOKEN** secret মুছে দিন।
+5. admin.html-এ গিয়ে লগইন করুন।
 
-## Cloudflare Worker build settings
+**কখনো SETUP_TOKEN, admin password, Cloudflare API token বা Turnstile secret source code/GitHub repository/chat-এ রাখবেন না।**
 
-Cloudflare Worker Settings → Builds → Connect to GitHub:
+## API routes
 
-- Repository: `itdaynamic96-hub/shayla-akram-worldclass`
-- Branch: `main`
-- Root directory: repository root (`/`)
-- Build command:
-  ```sh
-npx wrangler d1 migrations apply shayla-worldclass-db --remote --config cloudflare/wrangler.toml && npx wrangler deploy --config cloudflare/wrangler.toml
-```
+- GET /api/health — Worker ও D1 health
+- GET /api/setup/migrate — idempotent schema initialization; বর্তমান database already initialized
+- GET /api/public/bootstrap — কেবল প্রকাশিত content, YouTube video metadata ও prayer times
+- POST /api/intake — Turnstile-verified application/volunteer intake
+- POST /api/admin/setup — একবারের admin bootstrap, requires SETUP_TOKEN
+- POST /api/admin/login — rate-limited login
+- GET /api/admin/data — authenticated private admin data
+- /api/admin/content, /video, /prayer, /finance — authenticated management
+- /api/admin/application/status, /volunteer/status — authenticated review updates
 
-Cloudflare GitHub integration requires the account owner to sign in to GitHub and approve repository access. Never share GitHub passwords, passkeys, or OTPs in chat.
+ব্যক্তিগত আবেদন, ফোন, ঠিকানা ও অর্থের হিসাব কখনো public bootstrap response-এ থাকে না।
 
-## Required Worker secrets before enabling public forms/admin setup
+## Free-only media policy
 
-Configure these under Worker → Settings → Variables and Secrets:
+YouTube URL-ভিত্তিক ভিডিও গ্যালারি চালু। Direct binary media upload/R2 চালু করা হয়নি, কারণ এই প্রকল্পে payment method বা paid usage অনুমোদিত নয়। Public image/static assets GitHub repository-তে রাখা যায়; private applicant documents কখনো public repository-তে দেবেন না।
 
-- `SETUP_TOKEN` (Secret): a strong one-time setup token. Use it to create the first admin account at `POST /api/admin/setup`, then remove/rotate it after setup.
-- `TURNSTILE_SECRET` (Secret): secret from a Cloudflare Turnstile widget for `itdaynamic96-hub.github.io`.
+## CI ও verification
 
-The Turnstile site key is public and must be set in the website's `assets/app-config.js`. Until both keys and the form integration are configured and tested, public personal-data forms must remain closed.
-
-## API smoke tests after deployment
-
-1. `GET /api/health` must return `{"ok":true,"service":"worldclass-api"}`.
-2. `GET /api/setup/migrate` creates the idempotent schema only if the `admin_users` table is absent; it returns the table names. Prefer the Wrangler migration command above for deployment.
-3. `GET /api/public/bootstrap` returns only published content, public YouTube video metadata, and prayer times; response is cached for 60 seconds.
-4. `GET /api/admin/data` must return 401 without a valid admin session.
-5. Applications, volunteer records and financial entries are never included in the public bootstrap response.
-
-## Media limits under strict free-only policy
-
-- YouTube video URL management can work without R2 after the API is deployed.
-- Direct binary image/video upload is not enabled because R2 activation currently asks for a payment method and may bill beyond the free allowance.
-- Public images can be committed as static website assets in the GitHub repository; do not upload private documents or sensitive applicant files to the public repository.
-
-## Verification
-
-GitHub Actions checks the 25-module static website, JavaScript syntax, existing YouTube tests, Worker syntax, D1 schema structure, private/public data separation and Worker configuration. Passing CI does not mean the Cloudflare Worker has been deployed or live database operations have been tested.
-
-## বিকল্প Deploy পদ্ধতি — GitHub Actions
-
-Cloudflare-এর নিজস্ব Builds-এ পুরোনো migration conflict হলে এই আলাদা workflow ব্যবহার করুন। এটি শুধু Worker deploy করে; D1 migration চালায় না এবং কোনো ডেটা মুছে না।
-
-1. Cloudflare Dashboard → My Profile → API Tokens → Create Token থেকে custom token তৈরি করুন।
-2. প্রয়োজনীয় permission দিন: Account → Workers Scripts → Edit এবং Account → Account Settings → Read। শুধু এই Cloudflare account-এ সীমাবদ্ধ রাখুন।
-3. GitHub repository → Settings → Secrets and variables → Actions → New repository secret খুলুন।
-4. Secret name দিন CLOUDFLARE_API_TOKEN; Cloudflare token value সেখানে দিন। Token কখনো chat, source code বা README-তে লিখবেন না।
-5. GitHub repository → Actions → Deploy World-Class Hybrid Cloudflare Worker → Run workflow চাপুন।
-6. সফল হলে Worker URL-এ /api/health খুলে ok: true দেখা যাচ্ছে কি না যাচাই করুন।
-
-এই workflow manual trigger-এ সীমাবদ্ধ; Secret যোগ না করা পর্যন্ত কোনো deploy হবে না। Workflow সফল হওয়া মানেই frontend API integration বা public forms/admin setup সম্পন্ন নয়—সেগুলো আলাদাভাবে সংযুক্ত ও পরীক্ষা করতে হবে।
+GitHub Actions Pages workflow এখন static structure, module counts, JavaScript syntax, Cloudflare Worker security checks, YouTube tests এবং frontend API integration tests চালায়। Worker deploy workflow আলাদা। CI pass হওয়া browser end-to-end test বা প্রথম admin setup সম্পন্ন হওয়ার সমান নয়।
