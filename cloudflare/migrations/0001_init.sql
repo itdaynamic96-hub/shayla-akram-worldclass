@@ -1,7 +1,5 @@
 -- Cloudflare D1 schema for the independent World-Class Hybrid backend.
 -- Private tables are never exposed by public API routes.
-PRAGMA foreign_keys = ON;
-
 CREATE TABLE IF NOT EXISTS admin_users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT NOT NULL UNIQUE,
