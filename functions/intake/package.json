@@ -1,0 +1,9 @@
+{
+  "name": "mosque-foundation-intake",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "node-appwrite": "^20.0.0"
+  }
+}

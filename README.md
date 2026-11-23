@@ -2,22 +2,19 @@
 
 ## World-Class Hybrid — নতুন ও স্বতন্ত্র ওয়েবসাইট
 
-এই repository-টি পুরোনো ২০-মডিউল ওয়েবসাইট থেকে সম্পূর্ণ আলাদা। এখানে নতুন World-Class Hybrid ডিজাইনের ২৫-মডিউল ওয়েবসাইটের source code রাখা হবে।
+এই repository পুরোনো ২০-মডিউল ওয়েবসাইট থেকে সম্পূর্ণ আলাদা।
 
-## Source package
+## আপলোড করা ফাইল
+- `site-source.tar.gz` — ওয়েবসাইটের static source files; GitHub Pages workflow এটি extract করে deploy করবে।
+- `APPWRITE-SETUP-BN.md` — নতুন Appwrite project, tables, team ও security setup guide.
+- `functions/intake/` — application/volunteer intake Function source scaffold.
+- `README-BN.md` — প্রকল্পের অবস্থা ও সীমাবদ্ধতা।
 
-প্রস্তুত source package ও বাংলা Appwrite setup guide ChatGPT কথোপকথনে দেওয়া ডাউনলোড ফাইল থেকে নিন। সব ফাইল repository-র root-এ একই folder structure বজায় রেখে upload করতে হবে।
+## GitHub Pages চালু করুন
+Repository Settings → Pages → Build and deployment → Source: **GitHub Actions** নির্বাচন করুন। এরপর Actions tab-এ workflow run দেখুন। সফল হলে `https://OWNER.github.io/REPOSITORY/`-এ সাইট পরীক্ষা করুন।
 
-## Deployment status
+## Appwrite backend
+নতুন Appwrite project, database, tables, team, bucket, admin account ও Function configure করা এখনো বাকি। পুরোনো Appwrite project-এর কোনো ID পুনর্ব্যবহার করবেন না। `APPWRITE-SETUP-BN.md` অনুসরণ করুন। Browser config-এ কখনো API key/password/secret রাখবেন না।
 
-এই repository এখনো source package দিয়ে পূর্ণ করা হয়নি। GitHub Pages deployment চালু হয়েছে—এমন দাবি করা হচ্ছে না। Appwrite backend-ও এখনো নতুন project-এর সঙ্গে configure করা হয়নি।
-
-## Setup
-
-1. সম্পূর্ণ source package-এর সব ফাইল repository-তে upload করুন।
-2. Repository Settings → Pages → Build and deployment থেকে GitHub Actions নির্বাচন করুন।
-3. Appwrite-এর জন্য `APPWRITE-SETUP-BN.md` অনুসরণ করে আলাদা নতুন project, database, tables, team, storage bucket ও intake function তৈরি করুন।
-4. নতুন public identifiers `assets/app-config.js`-এ বসান। Browser config-এ কখনো API key বা secret রাখবেন না।
-5. GitHub Actions সফল হলে Pages URL পরীক্ষা করুন।
-
-পুরোনো Appwrite project বা পুরোনো repository-র কোনো ID এখানে ব্যবহার করবেন না।
+## বাস্তবায়নের সীমা
+এই upload live Appwrite integration বা full production admin suite নয়। Admin UI আপাতত সাধারণ content create/edit/delete-এর জন্য; sensitive application intake Function deploy, abuse protection ও integration test শেষ না হওয়া পর্যন্ত বাস্তব সংবেদনশীল তথ্য সংগ্রহ করবেন না।
