@@ -16,7 +16,11 @@
 .submenu-link:hover{background:#eaf5f0;color:var(--green)}
 .submenu-arrow{margin-left:auto;color:#8a9a9e;font-size:12px}
 .navbtn{white-space:nowrap}
-.home-no-modules .stats,.home-no-modules #mosque,.home-no-modules #foundation-modules{display:none!important}
+/* Keep the homepage focused: no module lists, counters or foundation overview. */
+.home-no-modules .stats,
+.home-no-modules #mosque,
+.home-no-modules #foundation,
+.home-no-modules #foundation-modules{display:none!important}
 @media(max-width:850px){
 .links{align-items:stretch;gap:8px;max-height:calc(100vh - 82px);overflow:auto}
 .nav-dropdown{width:100%}
