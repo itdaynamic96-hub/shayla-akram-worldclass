@@ -2,6 +2,14 @@ name: Deploy World-Class Hybrid Cloudflare Worker
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cloudflare/**'
+      - 'tests/cloudflare-backend.test.mjs'
+      - 'tests/youtube.test.mjs'
+      - '.github/workflows/deploy-cloudflare-worker.yml'
 
 permissions:
   contents: read
