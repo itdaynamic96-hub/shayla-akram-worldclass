@@ -13,8 +13,8 @@
   ]);
   const foundation = root('ফাউন্ডেশন', 'foundation-menu', [
     branch('পরিচিতি ও লক্ষ্য', [link(26,'ফাউন্ডেশন পরিচিতি'),link(27,'লক্ষ্য ও উদ্দেশ্য')]),
-    branch('মানবিক সহায়তা কার্যক্রম', [link(28,'দরিদ্র পরিবার সহায়তা'),link(29,'এতিম সহায়তা'),link(30,'শিক্ষাবৃত্তি ব্যবস্থাপনা'),link(31,'চিকিৎসা সহায়তা'),link(32,'দুর্যোগ ও ত্রাণ কার্যক্রম')]),
-    branch('পরিচালনা ও উন্নয়ন', [link(33,'স্বেচ্ছাসেবক ব্যবস্থাপনা'),link(34,'ফাউন্ডেশন প্রকল্প')])
+    branch('মানবিক সহায়তা কার্যক্রম', [link(28,'দরিদ্র পরিবার সহায়তা'),link(29,'এতিম সহায়তা'),link(30,'শিক্ষাবৃত্তি ব্যবস্থাপনা'),link(31,'চিকিৎসা সহায়তা'),link(32,'দুর্যোগ ও ত্রাণ কার্যক্রম'),'<a class="submenu-link" href="apply.html">সহায়তার আবেদন <span class="submenu-arrow">↗</span></a>']),
+    branch('পরিচালনা ও উন্নয়ন', [link(33,'স্বেচ্ছাসেবক ব্যবস্থাপনা'),link(34,'ফাউন্ডেশন প্রকল্প'),'<a class="submenu-link" href="volunteer.html">স্বেচ্ছাসেবক নিবন্ধন <span class="submenu-arrow">↗</span></a>'])
   ]);
   nav.innerHTML = `<a href="index.html">হোম</a>${mosque}${foundation}<a href="index.html#notices">নোটিশ</a><a href="index.html#contact">যোগাযোগ</a><a href="admin.html">অ্যাডমিন</a>`;
   const isHome = location.pathname.endsWith('/') || location.pathname.endsWith('/index.html');
@@ -24,6 +24,8 @@
     const foundationButton = document.querySelector('.hero .actions a[href="#foundation"]');
     if (mosqueButton) { mosqueButton.href='module.html?id=2'; mosqueButton.textContent='মসজিদ সম্পর্কে জানুন ↗'; }
     if (foundationButton) { foundationButton.href='module.html?id=27'; foundationButton.textContent='ফাউন্ডেশনের কার্যক্রম ↗'; }
+    const foundationCta=document.querySelector('#foundation .feature-panel a.btn');
+    if(foundationCta){foundationCta.href='module.html?id=27';foundationCta.textContent='লক্ষ্য ও উদ্দেশ্য দেখুন ↗';}
   }
   const closeMenus = () => {
     nav.classList.remove('open');
