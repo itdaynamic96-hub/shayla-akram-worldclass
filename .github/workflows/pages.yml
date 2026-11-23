@@ -30,13 +30,18 @@ jobs:
           sed -i 's#<script type="module" src="assets/site.js">#<script src="assets/app-config.js"></script><script type="module" src="assets/site.js">#' site/index.html
           sed -i 's#<script type="module" src="assets/module.js">#<script src="assets/app-config.js"></script><script type="module" src="assets/module.js">#' site/module.html
           sed -i 's#</body>#<script src="assets/menu.js" defer></script></body>#' site/index.html
-      - name: Validate website files
+      - name: Validate website files and tests
         run: |
           test -s site/index.html
           test -s site/modules.json
           test -s site/content.json
-          node -e "const fs=require('fs'); const m=JSON.parse(fs.readFileSync('site/modules.json')); const c=JSON.parse(fs.readFileSync('site/content.json')); if(m.length!==25) throw Error('Expected 25 modules'); if(m.filter(x=>x.group==='mosque').length!==16) throw Error('Mosque module count mismatch'); if(m.filter(x=>x.group==='foundation').length!==9) throw Error('Foundation module count mismatch'); if(new Set(m.map(x=>x.id)).size!==m.length) throw Error('Duplicate module IDs'); if(!Array.isArray(c)) throw Error('content.json must be an array'); for(const x of c){if(!m.some(y=>y.id===Number(x.moduleId))||!String(x.title||'').trim()||!String(x.body||'').trim()) throw Error('Invalid content item');}"
-          for file in site/assets/menu.js site/assets/site.js site/assets/module.js site/assets/admin.js site/assets/forms.js; do node --input-type=module --check < "$file"; done
+          test -s site/videos.html
+          test -s site/video-admin.html
+          test -s site/videos.json
+          node -e "const fs=require('fs'); const m=JSON.parse(fs.readFileSync('site/modules.json')); const c=JSON.parse(fs.readFileSync('site/content.json')); const v=JSON.parse(fs.readFileSync('site/videos.json')); if(m.length!==25) throw Error('Expected 25 modules'); if(m.filter(x=>x.group==='mosque').length!==16) throw Error('Mosque module count mismatch'); if(m.filter(x=>x.group==='foundation').length!==9) throw Error('Foundation module count mismatch'); if(new Set(m.map(x=>x.id)).size!==m.length) throw Error('Duplicate module IDs'); if(!Array.isArray(c)||!Array.isArray(v)) throw Error('JSON files must be arrays'); for(const x of c){if(!m.some(y=>y.id===Number(x.moduleId))||!String(x.title||'').trim()||!String(x.body||'').trim()) throw Error('Invalid content item');}"
+          for file in site/assets/menu.js site/assets/site.js site/assets/module.js site/assets/admin.js site/assets/forms.js site/assets/video-gallery.js site/assets/video-admin.js; do node --input-type=module --check < "$file"; done
+          node --check site/assets/youtube.mjs
+          node --test tests/youtube.test.mjs
           if grep -Eiq 'appwrite|YOUR_' site/assets/site.js site/assets/module.js site/assets/admin.js site/assets/app-config.js; then echo "Unexpected backend dependency or placeholder in static mode"; exit 1; fi
           grep -q 'assets/app-config.js' site/index.html
           grep -q 'assets/app-config.js' site/module.html
@@ -45,6 +50,8 @@ jobs:
           grep -q 'এই কম্পিউটার ও ব্রাউজারে' site/admin.html
           grep -q 'আবেদন সাময়িকভাবে বন্ধ' site/apply.html
           grep -q 'নিবন্ধন সাময়িকভাবে বন্ধ' site/volunteer.html
+          grep -q 'ভিডিও গ্যালারি' site/assets/menu.js
+          grep -q 'video-admin.html' site/admin.html
           test -s site/apply.html
           test -s site/volunteer.html
       - uses: actions/upload-pages-artifact@v3
