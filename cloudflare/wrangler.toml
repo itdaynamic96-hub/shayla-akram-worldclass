@@ -1,0 +1,14 @@
+name = "shayla-worldclass-api"
+main = "src/index.js"
+compatibility_date = "2026-11-24"
+workers_dev = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "shayla-worldclass-db"
+database_id = "4751623a-fcbd-4b68-b5a8-71f20c1fd2a7"
+migrations_dir = "migrations"
+
+[vars]
+ALLOWED_ORIGIN = "https://itdaynamic96-hub.github.io"
+PUBLIC_CACHE_SECONDS = "60"
