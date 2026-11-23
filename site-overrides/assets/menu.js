@@ -35,7 +35,7 @@
   const button=document.getElementById('menubtn');
   if(button){
     button.setAttribute('aria-controls','navlinks');button.setAttribute('aria-expanded','false');
-    button.addEventListener('click',()=>{const open=nav.classList.toggle('open');button.setAttribute('aria-expanded',String(open));button.textContent=open?'বন্ধ করুন ✕':'মেনু ☰';});
+    button.addEventListener('click',event=>{event.stopImmediatePropagation();const open=nav.classList.toggle('open');button.setAttribute('aria-expanded',String(open));button.textContent=open?'বন্ধ করুন ✕':'মেনু ☰';},true);
   }
   nav.querySelectorAll(':scope > .nav-dropdown').forEach(dropdown=>dropdown.addEventListener('toggle',()=>{
     if(dropdown.open)nav.querySelectorAll(':scope > .nav-dropdown').forEach(other=>{if(other!==dropdown)other.open=false;});
