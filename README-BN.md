@@ -5,26 +5,35 @@
 
 ## বর্তমান বাস্তব অবস্থা
 - হোমপেজ, বহুস্তর মেনু, ২৫টি মডিউল এবং মডিউল-ভিত্তিক তথ্য দেখানোর ব্যবস্থা রয়েছে।
-- Appwrite account-এর Free project limit পূর্ণ এবং Supabase/অন্য কোনো backend account সংযুক্ত করা হয়নি। তাই এই সংস্করণে server-side database নেই।
-- নিরাপদ বিকল্প হিসেবে public website-কে static JSON content mode-এ রাখা হয়েছে। এতে কোনো backend key বা secret লাগে না।
-- `admin.html` একটি local browser content editor: খসড়া তৈরি/সম্পাদনা, JSON import/export করা যায়। এটি নিরাপদ admin login নয়; ডেটা শুধু একই কম্পিউটার/ব্রাউজারের localStorage-এ থাকে।
-- কনটেন্ট সবার ওয়েবসাইটে প্রকাশ করতে `content.json` export করে repository-র `site-overrides/content.json` ফাইলে commit করতে হবে। GitHub Actions সফল হলে Pages-এ প্রকাশ হবে। এটি এখনো স্বয়ংক্রিয় নয়।
-- সহায়তার আবেদন ও স্বেচ্ছাসেবক নিবন্ধন পৃষ্ঠা সাময়িকভাবে বন্ধ রাখা হয়েছে। ব্যক্তিগত তথ্য জমা নেওয়ার কোনো সক্রিয় endpoint নেই।
-- Prayer-time database sync, media storage/upload, direct 50 MB video upload, YouTube gallery management, private application review, volunteer records, finance ledger, staff roles এবং পূর্ণ multi-user admin এখনো চালু নয়।
+- এই সংস্করণে server-side database নেই; Appwrite Free project quota পূর্ণ এবং নতুন কোনো backend account সংযুক্ত করা হয়নি।
+- `admin.html` একটি local browser content editor; এটি নিরাপদ অনলাইন admin login নয়। কনটেন্ট JSON export করে GitHub repository-তে commit করতে হয়।
+- `video-admin.html` দিয়ে YouTube URL, শিরোনাম ও বিবরণ যোগ/সম্পাদনা/মুছে ফেলা যায়। ভিডিও তালিকা localStorage-এ থাকে এবং `videos.json` export/import করা যায়।
+- YouTube gallery `videos.html`-এ privacy-enhanced `youtube-nocookie.com` embed ব্যবহার করে। কেবল HTTPS YouTube URL গ্রহণ করা হয়; watch, youtu.be, embed, shorts ও live URL সমর্থিত।
+- ভিডিও সবার জন্য প্রকাশ করতে `videos.json` export করে repository-র `site-overrides/videos.json` ফাইলে commit করতে হবে। এটি স্বয়ংক্রিয় publish নয়; local admin panel-এর সংরক্ষণ একই browser-এ সীমাবদ্ধ।
+- YouTube URL যোগ করা মানে YouTube-এ ভিডিও ফাইল আপলোড নয়। ভিডিওটি আগে YouTube-এ আপলোড করা থাকতে হবে এবং embed অনুমোদিত হতে হবে।
+- সহায়তার আবেদন ও স্বেচ্ছাসেবক নিবন্ধন সাময়িকভাবে বন্ধ; ব্যক্তিগত তথ্য জমা নেওয়ার সক্রিয় endpoint নেই।
+- Direct 50 MB video upload, media storage, prayer-time database sync, private application review, volunteer records, finance ledger, staff roles এবং পূর্ণ multi-user admin এখনো চালু নয়।
 
 ## প্রকাশিত ওয়েবসাইট
 https://itdaynamic96-hub.github.io/shayla-akram-worldclass/
 
-## স্থানীয় কনটেন্ট সম্পাদনা
-1. ওয়েবসাইটের `admin.html` খুলুন।
-2. মডিউল, শিরোনাম ও বিস্তারিত লেখা দিন; প্রকাশের জন্য প্রস্তুত নির্বাচন করুন।
-3. **প্রকাশিত JSON রপ্তানি** চাপুন।
-4. GitHub repository-তে `site-overrides/content.json` খুলে Edit করে রপ্তানি করা JSON বসিয়ে Commit changes করুন।
-5. Actions-এর Deploy workflow সফল হলে পরিবর্তন public site-এ দেখা যাবে।
+## YouTube ভিডিও যুক্ত করার ধাপ
+1. `video-admin.html` খুলুন।
+2. ভিডিওর শিরোনাম ও YouTube URL দিন; চাইলে বিবরণ লিখুন।
+3. ভিডিও সংরক্ষণ করুন। এটি এই ব্রাউজারে local ভাবে রাখা হবে।
+4. **ভিডিও JSON রপ্তানি** চাপুন।
+5. GitHub repository-তে `site-overrides/videos.json` সম্পাদনা করে export করা JSON বসিয়ে Commit changes করুন।
+6. GitHub Actions deploy সফল হলে `videos.html`-এ ভিডিও দেখা যাবে।
+
+## সাধারণ কনটেন্ট প্রকাশ
+1. `admin.html` খুলে মডিউল কনটেন্ট তৈরি করুন।
+2. প্রকাশিত JSON রপ্তানি করুন।
+3. GitHub-এ `site-overrides/content.json`-এ JSON বসিয়ে commit করুন।
+4. Actions deploy সফল হলে পরিবর্তন প্রকাশিত হবে।
 
 **সতর্কতা:** local editor-এ আবেদনকারীর নাম, ফোন, ঠিকানা, চিকিৎসা, আর্থিক বা অন্য ব্যক্তিগত তথ্য রাখবেন না। এটি ব্যক্তিগত তথ্যের নিরাপদ সংরক্ষণ ব্যবস্থা নয়।
 
 ## যাচাই
-GitHub Actions workflow-এ ২৫টি মডিউল, ১৬টি মসজিদ, ৯টি ফাউন্ডেশন, unique IDs, content JSON structure, JavaScript syntax, static-mode dependencies এবং আবেদন/স্বেচ্ছাসেবক পেজের নিরাপদ বন্ধ অবস্থা পরীক্ষা করা হয়। Workflow pass হওয়া browser end-to-end test বা live backend integration test নয়।
+GitHub Actions workflow-এ মডিউল গণনা, JSON structure, JavaScript syntax, YouTube URL parsing ও নিরাপদ embed URL-এর unit test এবং আবেদন/স্বেচ্ছাসেবক পেজের বন্ধ অবস্থা যাচাই করা হয়। Workflow pass হওয়া browser end-to-end বা live backend test নয়।
 
 কোনো পুরোনো Appwrite/Supabase project পরিবর্তন বা মুছে ফেলা হয়নি।
