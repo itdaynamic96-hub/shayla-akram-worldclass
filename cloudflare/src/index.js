@@ -266,6 +266,16 @@ export default {
         } else return json({error:"Unknown form type"},400,cors);
         return json({ok:true,referenceCode:reference},201,cors);
       }
+      if(path==="/api/crypto-self-test" && request.method==="GET") {
+        try {
+          const probeSalt=Uint8Array.from({length:16},(_,i)=>i+1);
+          const probeKey=await crypto.subtle.importKey("raw",encoder.encode("worldclass-safe-probe"),{name:"PBKDF2"},false,["deriveBits"]);
+          const probeBits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:probeSalt,iterations:1000,hash:"SHA-256"},probeKey,256);
+          return json({ok:true,algorithm:"PBKDF2-SHA-256",derivedBytes:probeBits.byteLength},200,cors);
+        } catch(error) {
+          return json({ok:false,stage:"PBKDF2_SELF_TEST",errorType:String(error?.name||"Error"),message:String(error?.message||"").slice(0,160)},500,cors);
+        }
+      }
       if(path==="/api/admin/setup" && request.method==="POST") {
         setupStage="check_configuration";
         if(!env.SETUP_TOKEN)return json({error:"Admin setup is not configured"},503,cors);
