@@ -1,12 +1,13 @@
 const API=(window.APP_CONFIG?.apiBase||"").replace(/\/$/,""),$=id=>document.getElementById(id),TOKEN_KEY="worldclass-admin-session";
-let token=sessionStorage.getItem(TOKEN_KEY)||"",data={content:[],videos:[],prayerTimes:[],applications:[],volunteers:[],accountEntries:[]},modules=[];
+let token=sessionStorage.getItem(TOKEN_KEY)||"",data={content:[],videos:[],prayerTimes:[],applications:[],volunteers:[],},modules=[];
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function request(path,options={}){const headers={"Content-Type":"application/json",...(options.headers||{})};if(token)headers.Authorization="Bearer "+token;const response=await fetch(API+path,{...options,headers});const result=await response.json().catch(()=>({error:"সার্ভারের উত্তর পড়া যায়নি।"}));if(!response.ok)throw Error(result.error||"অনুরোধ সম্পন্ন হয়নি।");return result;}
 function showMessage(id,message){const node=$(id);if(node)node.textContent=message;}
 function dateToday(){return new Date().toISOString().slice(0,10);}
 const countWords=value=>(String(value||"").trim().match(/\S+/g)||[]).length;
-function historyLimit(){const option=$("moduleSelect")?.selectedOptions?.[0];return /ইতিহাস|history/i.test(option?.textContent||"")?500:0;}
-function updateContentWordCount(){const max=historyLimit(),count=countWords($("contentBody")?.value||"");const node=$("contentWordCount");if(node)node.textContent=max?count+" / "+max+" শব্দ":"ইতিহাসের মডিউল নির্বাচন করলে ৫০০ শব্দের সীমা প্রযোজ্য";}
+const WORD_LIMIT=500;
+function bindWordLimit(inputId,counterId){const input=$(inputId),counter=$(counterId);if(!input)return;const update=()=>{if(countWords(input.value)>WORD_LIMIT){input.value=clampWords(input.value,WORD_LIMIT);showMessage("contentMsg","প্রতিটি লেখার ঘরে সর্বোচ্চ ৫০০ শব্দ রাখা যাবে।");}if(counter)counter.textContent=countWords(input.value)+" / ৫০০ শব্দ";};input.addEventListener("input",update);input.addEventListener("paste",event=>{const pasted=(event.clipboardData||window.clipboardData).getData("text");if(countWords(input.value+" "+pasted)>WORD_LIMIT){event.preventDefault();showMessage("contentMsg","পেস্টসহ সর্বোচ্চ ৫০০ শব্দ রাখা যাবে।");}});update();}
+function writingFieldsValid(ids){return ids.every(id=>!$(id)||countWords($(id).value)<=WORD_LIMIT);}
 function clampWords(value,max){let count=0;return(String(value||"").match(/\S+|\s+/g)||[]).filter(part=>{if(!/\S/.test(part))return true;if(count>=max)return false;count++;return true}).join("");}
 function resetContent(){$("contentId").value="";$("contentForm").reset();updateContentWordCount();}
 function rowTable(rows,columns){if(!rows.length)return "<p>এখনো কোনো তথ্য নেই।</p>";return "<div style='overflow-x:auto'><table><thead><tr>"+columns.map(c=>"<th>"+c.label+"</th>").join("")+"</tr></thead><tbody>"+rows.map(r=>"<tr>"+columns.map(c=>"<td>"+(c.render?c.render(r):esc(r[c.key]))+"</td>").join("")+"</tr>").join("")+"</tbody></table></div>";}
