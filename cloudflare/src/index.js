@@ -124,8 +124,10 @@ const randomToken = (n=32) => {
 async function digest(value) {
   return b64(await crypto.subtle.digest("SHA-256", encoder.encode(value)));
 }
-async function passwordHash(password, salt) {
+async function passwordHash(password, salt, onStage=()=>{}) {
+  onStage("import_password_key");
   const key = await crypto.subtle.importKey("raw", encoder.encode(password), {name:"PBKDF2"}, false, ["deriveBits"]);
+  onStage("derive_password_bits");
   const bits = await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(salt),iterations:120000,hash:{name:"SHA-256"}},key,256);
   return b64(bits);
 }
@@ -280,8 +282,7 @@ export default {
         if(!/^[a-z0-9._-]{3,80}$/.test(username)||password.length<14||password.length>128)return json({error:"Username or password does not meet requirements"},400,cors);
         setupStage="generate_password_salt";
         const salt=b64(crypto.getRandomValues(new Uint8Array(16)));
-        setupStage="derive_password_bits";
-        const hash=await passwordHash(password,salt);
+        const hash=await passwordHash(password,salt,stage=>{setupStage=stage;});
         setupStage="encode_password_hash";
         setupStage="save_admin_record";
         await env.DB.prepare("INSERT INTO admin_users(username,password_hash,password_salt) VALUES(?,?,?)").bind(username,hash,salt).run();
