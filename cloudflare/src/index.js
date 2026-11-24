@@ -367,7 +367,9 @@ export default {
       if(path==="/api/admin/setup" && request.method==="POST") {
         console.error("World-Class admin setup failed at",setupStage||"unknown_stage");
         const errorCode="ADMIN_SETUP_"+(setupStage||"UNKNOWN").toUpperCase();
-        return json({error:"সার্ভারে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন। (ত্রুটি কোড: "+errorCode+")",errorCode},500,cors);
+        const safeErrorNames=new Set(["Error","TypeError","DataError","OperationError","NotSupportedError","InvalidAccessError","QuotaExceededError","AbortError","SyntaxError"]);
+        const errorType=safeErrorNames.has(error?.name)?error.name.toUpperCase():"UNKNOWN";
+        return json({error:"সার্ভারে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন। (ত্রুটি কোড: "+errorCode+"; ধরন: "+errorType+")",errorCode,errorType},500,cors);
       }
       return json({error:"সার্ভারে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।"},500,cors);
     }
