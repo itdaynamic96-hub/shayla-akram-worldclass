@@ -128,7 +128,7 @@ async function passwordHash(password, salt, onStage=()=>{}) {
   onStage("import_password_key");
   const key = await crypto.subtle.importKey("raw", encoder.encode(password), {name:"PBKDF2"}, false, ["deriveBits"]);
   onStage("derive_password_bits");
-  const bits = await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(salt),iterations:120000,hash:{name:"SHA-256"}},key,256);
+  const bits = await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(salt),iterations:120000,hash:"SHA-256"},key,256);
   return b64(bits);
 }
 function constantEqual(a,b) {
@@ -265,19 +265,6 @@ export default {
           await env.DB.prepare("INSERT INTO volunteers(id,reference_code,name,phone,address,skills,status,submitted_at) VALUES(?,?,?,?,?,?,?,?)").bind(id,reference,name,phone,address,skills,"Pending",submittedAt).run();
         } else return json({error:"Unknown form type"},400,cors);
         return json({ok:true,referenceCode:reference},201,cors);
-      }
-      if(path==="/api/crypto-self-test" && request.method==="GET") {
-        let probeStage="generate_salt";
-        try {
-          const probeSalt=b64(crypto.getRandomValues(new Uint8Array(16)));
-          probeStage="import_password_key";
-          const probeKey=await crypto.subtle.importKey("raw",encoder.encode("worldclass-safe-probe"),{name:"PBKDF2"},false,["deriveBits"]);
-          probeStage="decode_salt_and_derive_password_bits";
-          const probeBits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(probeSalt),iterations:120000,hash:{name:"SHA-256"}},probeKey,256);
-          return json({ok:true,algorithm:"PBKDF2-SHA-256",iterations:120000,derivedBytes:probeBits.byteLength},200,cors);
-        } catch(error) {
-          return json({ok:false,stage:probeStage,errorType:String(error?.name||"Error"),message:String(error?.message||"").slice(0,160)},500,cors);
-        }
       }
       if(path==="/api/admin/setup" && request.method==="POST") {
         setupStage="check_configuration";
