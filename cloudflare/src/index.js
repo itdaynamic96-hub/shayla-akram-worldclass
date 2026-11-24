@@ -241,14 +241,17 @@ export default {
         const kind=clean(body.kind,20), data=body.data||{};
         const name=clean(data.name,120), phone=clean(data.phone,25), address=clean(data.address,1200);
         if(!name||!phone||!address)return json({error:"নাম, মোবাইল ও ঠিকানা পূরণ করুন।"},400,cors);
+        if([name,address].some(value=>wordCount(value)>MAX_WORDS))return json({error:"প্রতিটি লেখার ঘরে সর্বোচ্চ ৫০০ শব্দ রাখা যাবে।"},400,cors);
         const id=crypto.randomUUID(), reference="SA-"+crypto.randomUUID().slice(0,8).toUpperCase(), submittedAt=nowIso();
         if(kind==="application") {
           const category=clean(data.category,80),details=clean(data.details,3000);
           if(!category||!details)return json({error:"আবেদনের প্রয়োজনীয় তথ্য পূরণ করুন।"},400,cors);
+          if(wordCount(details)>MAX_WORDS)return json({error:"আবেদনের বিস্তারিত সর্বোচ্চ ৫০০ শব্দ হতে পারবে।"},400,cors);
           await env.DB.prepare("INSERT INTO applications(id,reference_code,category,name,phone,address,details,status,submitted_at) VALUES(?,?,?,?,?,?,?,?,?)").bind(id,reference,category,name,phone,address,details,"Pending",submittedAt).run();
         } else if(kind==="volunteer") {
           const skills=clean(data.skills,1500);
           if(!skills)return json({error:"দক্ষতার তথ্য লিখুন।"},400,cors);
+          if(wordCount(skills)>MAX_WORDS)return json({error:"দক্ষতা ও আগ্রহের বিবরণ সর্বোচ্চ ৫০০ শব্দ হতে পারবে।"},400,cors);
           await env.DB.prepare("INSERT INTO volunteers(id,reference_code,name,phone,address,skills,status,submitted_at) VALUES(?,?,?,?,?,?,?,?)").bind(id,reference,name,phone,address,skills,"Pending",submittedAt).run();
         } else return json({error:"Unknown form type"},400,cors);
         return json({ok:true,referenceCode:reference},201,cors);
