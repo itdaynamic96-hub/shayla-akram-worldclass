@@ -27,7 +27,10 @@ test("admin dashboard uses bearer sessions and private API routes",()=>{
  assert.ok(admin.includes("sessionStorage"));
  assert.ok(admin.includes("Authorization"));
  assert.ok(admin.includes('"/api/admin/"+s.dataset.statusKind+"/status"'));
- for(const route of ["/api/admin/login","/api/admin/data","/api/admin/content","/api/admin/video","/api/admin/prayer","/api/admin/finance"])assert.ok(admin.includes(route),"missing "+route);
+ for(const route of ["/api/admin/login","/api/admin/data","/api/admin/content","/api/admin/video","/api/admin/prayer"])assert.ok(admin.includes(route),"missing "+route);
+ assert.ok(!admin.includes("/api/admin/finance"));
+ assert.ok(admin.includes("WORD_LIMIT=500"));
+ assert.ok(admin.includes("writingFieldsValid"));
 });
 test("personal-data forms require Turnstile and send only to private intake endpoint",()=>{
  for(const page of [apply,volunteer]){
@@ -37,6 +40,8 @@ test("personal-data forms require Turnstile and send only to private intake endp
  assert.ok(forms.includes("/api/intake"));
  assert.ok(forms.includes("turnstileToken"));
  assert.ok(forms.includes("website"));
+ assert.ok(forms.includes("MAX_WORDS=500"));
+ assert.ok(forms.includes("প্রতিটি লেখার ঘরে সর্বোচ্চ ৫০০ শব্দ"));
 });
 test("first-admin setup requires a one-time token and strong password",()=>{
  assert.ok(setup.includes("X-Setup-Token"));
