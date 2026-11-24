@@ -202,6 +202,7 @@ export default {
     if(request.method==="OPTIONS")return new Response(null,{status:204,headers:cors});
     const url=new URL(request.url);
     const path=url.pathname.replace(/\/+$/,"")||"/";
+    let setupStage="";
     try {
       if(path==="/api/setup/migrate" && request.method==="GET") {
         const existing=await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='admin_users'").first();
@@ -264,15 +265,22 @@ export default {
         return json({ok:true,referenceCode:reference},201,cors);
       }
       if(path==="/api/admin/setup" && request.method==="POST") {
+        setupStage="check_configuration";
         if(!env.SETUP_TOKEN)return json({error:"Admin setup is not configured"},503,cors);
+        setupStage="read_request";
         const body=await readBody(request);
+        setupStage="verify_setup_token";
         const supplied=request.headers.get("X-Setup-Token")||"";
         if(!constantEqual(supplied,env.SETUP_TOKEN))return json({error:"Setup token invalid"},403,cors);
+        setupStage="check_existing_admin";
         const count=await env.DB.prepare("SELECT COUNT(*) AS total FROM admin_users").first();
         if(Number(count?.total||0)>0)return json({error:"Admin account already initialized"},409,cors);
+        setupStage="validate_credentials";
         const username=clean(body.username,80).toLowerCase(),password=String(body.password||"");
         if(!/^[a-z0-9._-]{3,80}$/.test(username)||password.length<14||password.length>128)return json({error:"Username or password does not meet requirements"},400,cors);
+        setupStage="generate_password_hash";
         const salt=b64(crypto.getRandomValues(new Uint8Array(16))),hash=await passwordHash(password,salt);
+        setupStage="save_admin_record";
         await env.DB.prepare("INSERT INTO admin_users(username,password_hash,password_salt) VALUES(?,?,?)").bind(username,hash,salt).run();
         return json({ok:true,message:"Admin account created. Remove SETUP_TOKEN from Worker secrets now."},201,cors);
       }
@@ -350,6 +358,10 @@ export default {
       return json({error:"Not found"},404,cors);
     } catch(error) {
       console.error("World-Class API error",error?.message||String(error));
+      if(path==="/api/admin/setup" && request.method==="POST") {
+        console.error("World-Class admin setup failed at",setupStage||"unknown_stage");
+        return json({error:"সার্ভারে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।",errorCode:"ADMIN_SETUP_"+(setupStage||"UNKNOWN").toUpperCase()},500,cors);
+      }
       return json({error:"সার্ভারে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।"},500,cors);
     }
   }
