@@ -297,7 +297,7 @@ export default {
             env.DB.prepare("SELECT * FROM applications ORDER BY submitted_at DESC LIMIT 300").all(),
             env.DB.prepare("SELECT * FROM volunteers ORDER BY submitted_at DESC LIMIT 300").all(),
           ]);
-          return json({username:admin.username,content:content.results||[],videos:videos.results||[],prayerTimes:prayerTimes.results||[],applications:applications.results||[],volunteers:volunteers.results||[]},200,cors);
+          return json({username:admin.username,content:content.results||[],videos:videos.results||[],prayerTimes:prayerTimes.results||[],applications:applications.results||[],volunteers:volunteers.results||[],accountEntries:[]},200,cors);
         }
         if(path==="/api/admin/content" && request.method==="POST") {
           const b=await readBody(request),id=clean(b.id,80)||crypto.randomUUID(),moduleId=Number(b.moduleId),title=clean(b.title,180),body=clean(b.body,12000),summary=clean(b.summary||body.slice(0,240),500),published=b.published===true?1:0;
