@@ -3,10 +3,20 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 const root=new URL("../site-overrides/",import.meta.url);
 const read=path=>readFile(new URL(path,root),"utf8");
-const [config,admin,forms,setup,setupHtml,apply,volunteer,site,module,video]=await Promise.all([
- read("assets/app-config.js"),read("assets/admin.js"),read("assets/forms.js"),read("assets/setup.js"),read("setup.html"),
+const [home,config,admin,forms,setup,setupHtml,apply,volunteer,site,module,video]=await Promise.all([
+ read("index.html"),read("assets/app-config.js"),read("assets/admin.js"),read("assets/forms.js"),read("assets/setup.js"),read("setup.html"),
  read("apply.html"),read("volunteer.html"),read("assets/site.js"),read("assets/module.js"),read("assets/video-gallery.js")
 ]);
+test("homepage contains sourced locality, transparent contact and no fabricated prayer times or sample notices",()=>{
+ assert.ok(home.includes("সাকছিপাড়া"));
+ assert.ok(home.includes("৪ নং কালচোঁ দক্ষিণ ইউনিয়ন"));
+ assert.ok(home.includes("হাজীগঞ্জ, চাঁদপুর"));
+ assert.ok(home.includes("যাচাইাধীন"));
+ assert.ok(home.includes("প্রকাশ্য মানচিত্র তালিকায় থাকা নম্বর"));
+ assert.ok(home.includes('id="latest-list"'));
+ assert.ok(!home.includes("নমুনা তথ্য"));
+ assert.ok(home.includes('assets/site.js'));
+});
 test("public frontend configuration points to the isolated Worker and only exposes Turnstile site key",()=>{
  assert.ok(config.includes("shayla-worldclass-api.itdaynamic96.workers.dev"));
  assert.ok(config.includes("turnstileSiteKey"));
