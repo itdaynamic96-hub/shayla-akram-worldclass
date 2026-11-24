@@ -3,8 +3,8 @@ let challengeToken="",widgetId=null;
 const message=document.getElementById("formMsg");
 function say(text){message.textContent=text;}
 const MAX_WORDS=500;
-const countWords=value=>(String(value||"").trim().match(/\\S+/g)||[]).length;
-const clampWords=(value,max)=>{let n=0;return(String(value||"").match(/\\S+|\\s+/g)||[]).filter(part=>{if(!/\\S/.test(part))return true;if(n>=max)return false;n++;return true}).join("")};
+const countWords=value=>(String(value||"").trim().match(/\S+/g)||[]).length;
+const clampWords=(value,max)=>{let n=0;return(String(value||"").match(/\S+|\s+/g)||[]).filter(part=>{if(!/\S/.test(part))return true;if(n>=max)return false;n++;return true}).join("")};
 if(form){for(const id of ["name","address","details","skills"]){const field=document.getElementById(id);if(!field)continue;const counter=document.createElement("small");counter.className="muted";counter.textContent="০ / ৫০০ শব্দ";field.parentElement.append(counter);const update=()=>{if(countWords(field.value)>MAX_WORDS){field.value=clampWords(field.value,MAX_WORDS);say("প্রতিটি লেখার ঘরে সর্বোচ্চ ৫০০ শব্দ রাখা যাবে।")}counter.textContent=countWords(field.value)+" / ৫০০ শব্দ"};field.addEventListener("input",update);field.addEventListener("paste",event=>{const pasted=(event.clipboardData||window.clipboardData).getData("text");if(countWords(field.value+" "+pasted)>MAX_WORDS){event.preventDefault();say("পেস্টসহ সর্বোচ্চ ৫০০ শব্দ রাখা যাবে।")}});}}
 function mountChallenge(){
  if(!form||!window.turnstile||!siteKey||widgetId!==null)return;
