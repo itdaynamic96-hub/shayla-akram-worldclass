@@ -62,6 +62,9 @@ test("admin setup readiness diagnostics reveal only safe booleans", () => {
 test("admin setup failures expose only a safe stage code, never secret values", () => {
   for (const stage of ["check_configuration","read_request","verify_setup_token","check_existing_admin","validate_credentials","generate_password_salt","import_password_key","derive_password_bits","encode_password_hash","save_admin_record"]) assert.ok(worker.includes('setupStage="'+stage+'"'));
   assert.ok(worker.includes('const errorCode="ADMIN_SETUP_"+(setupStage||"UNKNOWN").toUpperCase()'));
-  assert.ok(worker.includes('errorCode},500,cors'));
+  assert.ok(worker.includes('errorCode,errorType},500,cors'));
+  assert.ok(worker.includes('safeErrorNames.has(error?.name)'));
+  assert.ok(worker.includes('"OperationError"'));
   assert.ok(!worker.includes('errorCode: error.message'));
+  assert.ok(!worker.includes('errorType:error.message'));
 });
