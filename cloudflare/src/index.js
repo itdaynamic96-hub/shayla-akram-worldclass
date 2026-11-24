@@ -206,11 +206,15 @@ export default {
       if(path==="/api/setup/migrate" && request.method==="GET") {
         const existing=await env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='admin_users'").first();
         if(!existing)await env.DB.exec(SCHEMA_SQL);
-        const [tables,adminCount]=await Promise.all([
+        const [tables,adminCount,adminColumns]=await Promise.all([
           env.DB.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all(),
-          env.DB.prepare("SELECT COUNT(*) AS total FROM admin_users").first()
+          env.DB.prepare("SELECT COUNT(*) AS total FROM admin_users").first(),
+          env.DB.prepare("PRAGMA table_info(admin_users)").all()
         ]);
-        return json({ok:true,initialized:true,adminAccountCreated:Number(adminCount?.total||0)>0,tables:(tables.results||[]).map(row=>row.name)},200,cors);
+        const requiredAdminColumns=["id","username","password_hash","password_salt","created_at"];
+        const actualAdminColumns=(adminColumns.results||[]).map(row=>row.name);
+        const adminSchemaValid=requiredAdminColumns.every(name=>actualAdminColumns.includes(name));
+        return json({ok:true,initialized:true,adminAccountCreated:Number(adminCount?.total||0)>0,adminSchemaValid,setupTokenConfigured:Boolean(env.SETUP_TOKEN),tables:(tables.results||[]).map(row=>row.name)},200,cors);
       }
       if(path==="/api/setup/migrate" && request.method==="POST") {
         const supplied=request.headers.get("X-Setup-Token")||"";
