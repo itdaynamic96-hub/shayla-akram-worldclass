@@ -49,3 +49,11 @@ test("setup status reports only whether an admin account exists", () => {
   assert.ok(worker.includes('adminAccountCreated:Number(adminCount?.total||0)>0'));
   assert.ok(!worker.includes('adminPassword') && !worker.includes('password_hash FROM admin_users'));
 });
+
+
+test("admin setup readiness diagnostics reveal only safe booleans", () => {
+  assert.ok(worker.includes('PRAGMA table_info(admin_users)'));
+  assert.ok(worker.includes('const adminSchemaValid=requiredAdminColumns.every'));
+  assert.ok(worker.includes('setupTokenConfigured:Boolean(env.SETUP_TOKEN)'));
+  assert.ok(!worker.includes('actualAdminColumns:'));
+});
