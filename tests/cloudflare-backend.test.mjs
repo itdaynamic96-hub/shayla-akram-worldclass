@@ -43,3 +43,9 @@ test("D1 migration is idempotent and does not delete data", () => {
   assert.ok(worker.includes("await env.DB.exec(SCHEMA_SQL)"));
   assert.ok(!/DROP TABLE|DELETE FROM site_content|DELETE FROM applications/i.test(schema));
 });
+
+test("setup status reports only whether an admin account exists", () => {
+  assert.ok(worker.includes('SELECT COUNT(*) AS total FROM admin_users'));
+  assert.ok(worker.includes('adminAccountCreated:Number(adminCount?.total||0)>0'));
+  assert.ok(!worker.includes('adminPassword') && !worker.includes('password_hash FROM admin_users'));
+});
