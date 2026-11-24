@@ -59,6 +59,11 @@ test("admin setup readiness diagnostics reveal only safe booleans", () => {
 });
 
 
+test("password hashing stays within Cloudflare Workers PBKDF2 iteration limit", () => {
+  assert.ok(worker.includes("iterations:100000"));
+  assert.ok(!worker.includes("iterations:120000"));
+});
+
 test("admin setup failures expose only a safe stage code, never secret values", () => {
   for (const stage of ["check_configuration","read_request","verify_setup_token","check_existing_admin","validate_credentials","generate_password_salt","encode_password_hash","save_admin_record"]) assert.ok(worker.includes('setupStage="'+stage+'"'));
   assert.ok(worker.includes('onStage("import_password_key")'));
