@@ -1,6 +1,8 @@
 const encoder = new TextEncoder();
 const VALID_MODULES = new Set([...Array.from({length:16},(_,i)=>i+1),...Array.from({length:9},(_,i)=>i+26)]);
 const MAX_BODY = 16 * 1024;
+const MAX_WORDS = 500;
+const wordCount = value => (String(value ?? '').trim().match(/\\S+/g) || []).length;
 const SESSION_SECONDS = 8 * 60 * 60;
 const SCHEMA_SQL = String.raw`-- Cloudflare D1 schema for the independent World-Class Hybrid backend.
 -- Private tables are never exposed by public API routes.
@@ -285,19 +287,19 @@ export default {
           return json({ok:true},200,cors);
         }
         if(path==="/api/admin/data" && request.method==="GET") {
-          const [content,videos,prayerTimes,applications,volunteers,accountEntries]=await Promise.all([
+          const [content,videos,prayerTimes,applications,volunteers]=await Promise.all([
             env.DB.prepare("SELECT * FROM site_content ORDER BY updated_at DESC LIMIT 500").all(),
             env.DB.prepare("SELECT * FROM videos ORDER BY created_at DESC LIMIT 200").all(),
             env.DB.prepare("SELECT * FROM prayer_times ORDER BY date_key DESC LIMIT 90").all(),
             env.DB.prepare("SELECT * FROM applications ORDER BY submitted_at DESC LIMIT 300").all(),
             env.DB.prepare("SELECT * FROM volunteers ORDER BY submitted_at DESC LIMIT 300").all(),
-            env.DB.prepare("SELECT * FROM account_entries ORDER BY occurred_on DESC LIMIT 500").all()
           ]);
-          return json({username:admin.username,content:content.results||[],videos:videos.results||[],prayerTimes:prayerTimes.results||[],applications:applications.results||[],volunteers:volunteers.results||[],accountEntries:accountEntries.results||[]},200,cors);
+          return json({username:admin.username,content:content.results||[],videos:videos.results||[],prayerTimes:prayerTimes.results||[],applications:applications.results||[],volunteers:volunteers.results||[]},200,cors);
         }
         if(path==="/api/admin/content" && request.method==="POST") {
           const b=await readBody(request),id=clean(b.id,80)||crypto.randomUUID(),moduleId=Number(b.moduleId),title=clean(b.title,180),body=clean(b.body,12000),summary=clean(b.summary||body.slice(0,240),500),published=b.published===true?1:0;
           if(!VALID_MODULES.has(moduleId)||!title||!body)return json({error:"মডিউল, শিরোনাম ও বিস্তারিত সঠিকভাবে দিন।"},400,cors);
+          if([title,body,summary].some(value=>wordCount(value)>MAX_WORDS))return json({error:"প্রতিটি লেখার ঘরে সর্বোচ্চ ৫০০ শব্দ রাখা যাবে।"},400,cors);
           const updatedAt=nowIso();
           await env.DB.prepare("INSERT INTO site_content(id,module_id,title,summary,body,published,updated_at) VALUES(?,?,?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET module_id=excluded.module_id,title=excluded.title,summary=excluded.summary,body=excluded.body,published=excluded.published,updated_at=excluded.updated_at").bind(id,moduleId,title,summary,body,published,updatedAt).run();
           await audit(env.DB,admin.admin_id,"save","content",id);
@@ -310,6 +312,7 @@ export default {
         if(path==="/api/admin/video" && request.method==="POST") {
           const b=await readBody(request),title=clean(b.title,160),description=clean(b.description,1000),youtube=youtubeId(clean(b.url,500));
           if(!title||!youtube)return json({error:"সঠিক শিরোনাম ও YouTube URL দিন।"},400,cors);
+          if([title,description].some(value=>wordCount(value)>MAX_WORDS))return json({error:"ভিডিওর প্রতিটি লেখার ঘরে সর্বোচ্চ ৫০০ শব্দ রাখা যাবে।"},400,cors);
           const id=youtube;
           await env.DB.prepare("INSERT INTO videos(id,youtube_id,title,description,created_at) VALUES(?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET title=excluded.title,description=excluded.description").bind(id,youtube,title,description,nowIso()).run();
           await audit(env.DB,admin.admin_id,"save","video",id);return json({ok:true,id},200,cors);
@@ -331,17 +334,6 @@ export default {
           if(table==="applications")await env.DB.prepare("UPDATE applications SET status=?,reviewed_at=?,review_note=? WHERE id=?").bind(status,nowIso(),note,id).run();
           else await env.DB.prepare("UPDATE volunteers SET status=? WHERE id=?").bind(status,id).run();
           await audit(env.DB,admin.admin_id,"update-status",table,id);return json({ok:true},200,cors);
-        }
-        if(path==="/api/admin/finance" && request.method==="POST") {
-          const b=await readBody(request),fund=clean(b.fund,40),type=clean(b.entryType,10),amount=Number(b.amount),date=clean(b.occurredOn,10),description=clean(b.description,1000),reference=clean(b.reference,100);
-          if(!fund||!["income","expense"].includes(type)||!Number.isFinite(amount)||amount<=0||amount>100000000||!validDate(date)||!description)return json({error:"হিসাবের তথ্য সঠিকভাবে দিন।"},400,cors);
-          const id=crypto.randomUUID(),paisa=Math.round(amount*100);
-          await env.DB.prepare("INSERT INTO account_entries(id,fund,entry_type,amount_paisa,occurred_on,description,reference,created_at) VALUES(?,?,?,?,?,?,?,?)").bind(id,fund,type,paisa,date,description,reference,nowIso()).run();
-          await audit(env.DB,admin.admin_id,"create","account_entry",id);return json({ok:true,id},201,cors);
-        }
-        if(path==="/api/admin/finance" && request.method==="DELETE") {
-          const id=clean(url.searchParams.get("id"),80);if(!id)return json({error:"ID required"},400,cors);
-          await env.DB.prepare("DELETE FROM account_entries WHERE id=?").bind(id).run();await audit(env.DB,admin.admin_id,"delete","account_entry",id);return json({ok:true},200,cors);
         }
         return json({error:"Not found"},404,cors);
       }
