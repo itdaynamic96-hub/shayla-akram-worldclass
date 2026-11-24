@@ -128,7 +128,7 @@ async function passwordHash(password, salt, onStage=()=>{}) {
   onStage("import_password_key");
   const key = await crypto.subtle.importKey("raw", encoder.encode(password), {name:"PBKDF2"}, false, ["deriveBits"]);
   onStage("derive_password_bits");
-  const bits = await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(salt),iterations:120000,hash:"SHA-256"},key,256);
+  const bits = await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(salt),iterations:100000,hash:"SHA-256"},key,256);
   return b64(bits);
 }
 function constantEqual(a,b) {
