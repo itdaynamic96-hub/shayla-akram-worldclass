@@ -2,7 +2,7 @@ const encoder = new TextEncoder();
 const VALID_MODULES = new Set([...Array.from({length:16},(_,i)=>i+1),...Array.from({length:9},(_,i)=>i+26)]);
 const MAX_BODY = 16 * 1024;
 const MAX_WORDS = 500;
-const wordCount = value => (String(value ?? '').trim().match(/\\S+/g) || []).length;
+const wordCount = value => (String(value ?? '').trim().match(/\S+/g) || []).length;
 const SESSION_SECONDS = 8 * 60 * 60;
 const SCHEMA_SQL = String.raw`-- Cloudflare D1 schema for the independent World-Class Hybrid backend.
 -- Private tables are never exposed by public API routes.
