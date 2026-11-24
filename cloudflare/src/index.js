@@ -125,8 +125,8 @@ async function digest(value) {
   return b64(await crypto.subtle.digest("SHA-256", encoder.encode(value)));
 }
 async function passwordHash(password, salt) {
-  const key = await crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveBits"]);
-  const bits = await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(salt),iterations:120000,hash:"SHA-256"},key,256);
+  const key = await crypto.subtle.importKey("raw", encoder.encode(password), {name:"PBKDF2"}, false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(salt),iterations:120000,hash:{name:"SHA-256"}},key,256);
   return b64(bits);
 }
 function constantEqual(a,b) {
@@ -280,12 +280,9 @@ export default {
         if(!/^[a-z0-9._-]{3,80}$/.test(username)||password.length<14||password.length>128)return json({error:"Username or password does not meet requirements"},400,cors);
         setupStage="generate_password_salt";
         const salt=b64(crypto.getRandomValues(new Uint8Array(16)));
-        setupStage="import_password_key";
-        const passwordKey=await crypto.subtle.importKey("raw",encoder.encode(password),"PBKDF2",false,["deriveBits"]);
         setupStage="derive_password_bits";
-        const passwordBits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:unb64(salt),iterations:120000,hash:"SHA-256"},passwordKey,256);
+        const hash=await passwordHash(password,salt);
         setupStage="encode_password_hash";
-        const hash=b64(passwordBits);
         setupStage="save_admin_record";
         await env.DB.prepare("INSERT INTO admin_users(username,password_hash,password_salt) VALUES(?,?,?)").bind(username,hash,salt).run();
         return json({ok:true,message:"Admin account created. Remove SETUP_TOKEN from Worker secrets now."},201,cors);
