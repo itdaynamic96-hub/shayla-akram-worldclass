@@ -30,6 +30,7 @@ jobs:
           sed -i 's#</head>#<link rel="stylesheet" href="assets/menu.css"></head>#' site/index.html
           sed -i 's#<script type="module" src="assets/site.js">#<script src="assets/app-config.js"></script><script type="module" src="assets/site.js">#' site/index.html
           sed -i 's#<script type="module" src="assets/module.js">#<script src="assets/app-config.js"></script><script type="module" src="assets/module.js">#' site/module.html
+          sed -i 's#assets/module.js"#assets/module.js?v=20261125-audiofix"#' site/module.html
           sed -i 's#</body>#<script src="assets/menu.js" defer></script></body>#' site/index.html
       - name: Validate website files and tests
         run: |
