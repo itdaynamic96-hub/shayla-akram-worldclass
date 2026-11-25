@@ -68,4 +68,5 @@ test("published posts expose free Bengali male read-aloud controls and ayah-leve
  assert.ok(module.includes("ar.alafasy"));
  assert.ok(!module.includes("speechSynthesis"));
  assert.ok(module.includes("@spelling-creator/spellophone"));
+ assert.ok(!module.includes("const sampleContent="),"unpublished placeholder posts must not be shown as real posts");
 });
