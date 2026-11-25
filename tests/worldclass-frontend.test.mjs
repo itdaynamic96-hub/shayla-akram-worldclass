@@ -65,6 +65,8 @@ test("published posts expose free Bengali male read-aloud controls and ayah-leve
  assert.ok(module.includes('loadVoice("bn")'));
  assert.ok(module.includes("data-listen-post"));
  assert.ok(module.includes("data-quran-ayah"));
+ assert.ok(module.includes("readable-block"),"each paragraph/ayah must have its own controls beneath it");
+ assert.ok(module.includes("data-stop-playback"));
  assert.ok(module.includes("ar.alafasy"));
  assert.ok(!module.includes("speechSynthesis"));
  assert.ok(module.includes("@spelling-creator/spellophone"));
