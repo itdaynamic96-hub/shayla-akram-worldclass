@@ -67,6 +67,11 @@ test("published posts expose free Bengali male read-aloud controls and ayah-leve
  assert.ok(module.includes("data-quran-ayah"));
  assert.ok(module.includes("readable-block"),"each paragraph/ayah must have its own controls beneath it");
  assert.ok(module.includes("data-stop-playback"));
+ assert.ok(module.includes("data-listen-arabic"),"Arabic Hadith blocks must have a read button");
+ assert.ok(module.includes("data-missing-quran-ref"),"Quran Arabic blocks must expose a recitation control even when the verse reference is missing");
+ assert.ok(module.includes("dist/browser.js"));
+ assert.ok(module.includes("dist/wasm2js.js"),"speech engine must have a WebAssembly-blocked fallback");
+ assert.ok(!module.includes("speechSynthesis"),"audio must not depend on device-installed Bengali voices");
  assert.ok(module.includes("ar.alafasy"));
  assert.ok(!module.includes("speechSynthesis"));
  assert.ok(module.includes("@spelling-creator/spellophone"));
