@@ -58,3 +58,14 @@ test("first-admin setup requires a one-time token and strong password",()=>{
  assert.ok(setup.includes("/api/admin/setup"));
  assert.ok(setupHtml.includes("minlength=\"14\""));
 });
+
+
+test("published posts expose free Bengali male read-aloud controls and ayah-level authentic recitation",()=>{
+ assert.ok(module.includes("createEspeak"));
+ assert.ok(module.includes('loadVoice("bn")'));
+ assert.ok(module.includes("data-listen-post"));
+ assert.ok(module.includes("data-quran-ayah"));
+ assert.ok(module.includes("ar.alafasy"));
+ assert.ok(!module.includes("speechSynthesis"));
+ assert.ok(module.includes("@spelling-creator/spellophone"));
+});
