@@ -77,3 +77,14 @@ test("published posts expose free Bengali male read-aloud controls and ayah-leve
  assert.ok(module.includes("@spelling-creator/spellophone"));
  assert.ok(!module.includes("const sampleContent="),"unpublished placeholder posts must not be shown as real posts");
 });
+
+test("Quran and sourced Sahih Hadith reader is wired into module 14",async()=>{
+ const reader=await readFile(new URL("../site-overrides/assets/quran-hadith.js",import.meta.url),"utf8");
+ assert.ok(module.includes("assets/quran-hadith.js"));
+ assert.ok(reader.includes("quran-uthmani"));
+ assert.ok(reader.includes("bn.bengali"));
+ assert.ok(reader.includes("ar.alafasy"));
+ assert.ok(reader.includes("sahih-al-bukhari.com/api/v1"));
+ assert.ok(reader.includes("fawazahmed0/hadith-api"));
+ assert.ok(reader.includes("বাংলা অনুবাদ যোগ করা হয়নি"));
+});
